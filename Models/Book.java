@@ -1,3 +1,5 @@
+package Models;
+
 public class Book {
     private String title;
     private String author;
@@ -39,8 +41,15 @@ public class Book {
         this.quantity = newQuantity;
     }
 
-    public static void main(String[] args){
-        Book newObj = new Book("my title", "my author", "my isbn", 55);
-        System.out.println(newObj.author);
+    public static void main(String[] args)
+    {
+
+        Book newObj = new Book("Crime and Punishment\n", "Fyodor Dostoevsky", "0-9767736-6-X", 10);
+        System.out.println("************************************");
+        System.out.println("Title :".concat(" ").concat(newObj.getTitle()));
+        System.out.println("Author :".concat(" ").concat(newObj.getAuthor()));
+        System.out.println("ISBN :".concat(" ").concat(newObj.getISBN()));
+        System.out.println("Quantity : " + newObj.getQuantity());
+        System.out.println("************************************");
     }
 }
