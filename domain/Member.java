@@ -29,7 +29,7 @@ public class Member {
         this.gender = gender;
     }
 
-    public String getMember_code(){
+    public String getMemberCode(){
         return member_code;
     }
     public void setMember_code(String member_code){

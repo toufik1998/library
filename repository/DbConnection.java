@@ -2,20 +2,28 @@ package repository;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.*;
+import java.sql.SQLException;
 
 public class DbConnection {
-    public static void main(String[] args){
-        String url = "jdbc:mysql://localhost:3306/library_management";
-        String username = "root";
-        String password = "";
+    private Connection connection;
 
+    public DbConnection(String url, String username, String password) {
         try {
-            Connection connection = DriverManager.getConnection(url, username, password);
-            connection.close();
+            connection = DriverManager.getConnection(url, username, password);
+        } catch (SQLException e) {
+            System.out.println("Connection failed");
         }
-        catch (Exception e){
-            System.out.println(e);
+    }
+
+    public Connection getConnection() {
+        return connection;
+    }
+
+    public void closeConnection() {
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            System.out.println("Closing connection failed");
         }
     }
 }
