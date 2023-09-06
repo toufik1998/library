@@ -1,17 +1,22 @@
 package domain;
 
+import repository.DbConnection;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 
 public class Book {
     private String title;
-    private Author author;
+    private int idAuthor;
     private String isbn;
     private int quantity;
     private List<BookCopy> copies;
 
-    public Book(String title , Author author, String isbn, int quantity){
+    public Book(String title , int author, String isbn, int quantity){
         this.title = title;
-        this.author = author;
+        this.idAuthor = author;
         this.isbn = isbn;
         this.quantity = quantity;
     }
@@ -23,11 +28,9 @@ public class Book {
         this.title = title;
     }
 
-    public Author getAuthor(){
-        return author;
-    }
-    public void setAuthor(Author author){
-        this.author = author;
+    public int getAuthor(){ return idAuthor; }
+    public void setAuthor(int author){
+        this.idAuthor = author;
     }
 
     public String getIsbn(){
@@ -52,17 +55,4 @@ public class Book {
         this.copies = copies;
     }
 
-
-
-//    public static void main(String[] args)
-//    {
-//
-//        Book newObj = new Book("Crime and Punishment\n", "Fyodor Dostoevsky", "0-9767736-6-X", 10);
-//        System.out.println("************************************");
-//        System.out.println("Title :".concat(" ").concat(newObj.getTitle()));
-//        System.out.println("Author :".concat(" ").concat(newObj.getAuthor()));
-//        System.out.println("ISBN :".concat(" ").concat(newObj.getISBN()));
-//        System.out.println("Quantity : " + newObj.getQuantity());
-//        System.out.println("************************************");
-//    }
 }
