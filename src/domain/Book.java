@@ -10,7 +10,6 @@ import java.util.List;
 public class Book {
     private String title;
     private String author;
-    private int year;
     private String isbn;
     private int quantity;
     private List<BookCopy> copies;
