@@ -125,20 +125,20 @@ public class Main {
             System.out.println("Enter the new title of the book:");
             String title = scanner.nextLine();
 
-            System.out.println("Enter the new ID of the author:");
+            System.out.println("Enter the new name of the author:");
             String author = scanner.nextLine();
 
             System.out.println("Enter the new quantity of the book:");
             int quantity = scanner.nextInt();
             scanner.nextLine();
 
-            Book updateBook = new Book(title, author, isbn, quantity);
+            Book book = new Book(title, author, isbn, quantity);
 
-            bookService.updateBook(isbn, updateBook);
+            bookService.updateBook(book);
 
             System.out.println("Book has been updated successfully!");
         }else {
-            System.out.println("book doesnt exist");
+            System.out.println("Either the ISBN is not valid or no book has the ISBN you entered.");
         }
     }
     private static void deleteBook() throws SQLException{

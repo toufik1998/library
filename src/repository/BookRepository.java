@@ -44,7 +44,49 @@ public class BookRepository {
         }
 
         return authorId;
+    }
+    public int getBookId(String isbn) throws SQLException {
+        String query = "SELECT ID FROM book WHERE isbn = ?";
+        PreparedStatement stmt = dbConnection.getConnection().prepareStatement(query);
+        stmt.setString(1, isbn);
+        ResultSet resultSet = stmt.executeQuery();
 
+        int bookId = -1;
+
+        if (resultSet.next()) {
+            bookId = resultSet.getInt("id");
+        }
+        return bookId;
+    }
+    public int numberOfDisponibleCopies(String isbn) throws SQLException {
+        String totalOfAvailableCopies = "SELECT COUNT(*) AS availableCopies FROM bookcopy INNER JOIN book ON book.id = bookcopy.book_id WHERE isbn = ? AND status = 'available'";
+
+        PreparedStatement stmt = dbConnection.getConnection().prepareStatement(totalOfAvailableCopies);
+        stmt.setString(1, isbn);
+        ResultSet resultSet = stmt.executeQuery();
+
+        int availableCopies = -1;
+
+        if (resultSet.next()){
+            availableCopies = resultSet.getInt("availableCopies");
+        }
+
+        return availableCopies;
+    }
+    public int numberOfTotalCopies(String isbn) throws SQLException {
+        String totalOfAllCopies = "SELECT COUNT(*) AS totalCopies FROM bookcopy INNER JOIN book ON book.id = bookcopy.book_id WHERE isbn = ?";
+
+        PreparedStatement stmt2 = dbConnection.getConnection().prepareStatement(totalOfAllCopies);
+        stmt2.setString(1, isbn);
+        ResultSet resultSet2 = stmt2.executeQuery();
+
+        int totalCopies = -1;
+
+        if(resultSet2.next()){
+            totalCopies = resultSet2.getInt("totalCopies");
+        }
+
+        return totalCopies;
     }
 
     public boolean isBookExists(String isbn) throws SQLException {
@@ -58,16 +100,58 @@ public class BookRepository {
     }
 
 
-    public void updateBook(String isbn, Book updateBook) throws SQLException{
+    public void updateBook(Book book, int authorId) throws SQLException{
         String query = "UPDATE book SET title = ? , author_id = ? , quantity = ? WHERE isbn = ?";
 
-        PreparedStatement statement = dbConnection.getConnection().prepareStatement(query);
-        statement.setString(1, updateBook.getTitle());
-        statement.setInt(2, 1);
-        statement.setInt(3, updateBook.getQuantity());
-        statement.setString(4, updateBook.getIsbn());
-        statement.executeUpdate();
+        try {
+            PreparedStatement statement = dbConnection.getConnection().prepareStatement(query);
+            statement.setString(1, book.getTitle());
+            statement.setInt(2, authorId);
+            statement.setString(4, book.getIsbn());
+            statement.setInt(3, book.getQuantity());
+            statement.executeUpdate();
+        }catch (SQLException e) {
+            System.out.println("Something went wrong when trying to update book : " + e.getMessage());
+        }
+
+
     }
+
+    public void deleteCopies(int copiesToDelete){
+        String query = "DELETE FROM bookcopy WHERE status = 'available' limit ?";
+        try {
+            PreparedStatement statement = dbConnection.getConnection().prepareStatement(query);
+            statement.setInt(1, copiesToDelete);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Something went wrong when trying to delete copies: " + e.getMessage());
+        }
+    }
+
+    public void addCopies(int bookId, int copiesToAdd){
+        String query = "INSERT INTO bookcopy (book_id, status) VALUES (?, 'available')";
+        try {
+            PreparedStatement statement = dbConnection.getConnection().prepareStatement(query);
+            for(int i = 0; i < copiesToAdd ; i++){
+                statement.setInt(1, bookId);
+                statement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            System.out.println("Something went wrong when trying to add copies : " + e.getMessage());
+        }
+    }
+
+    public void addAuthor(String authorName){
+        String query = "INSERT INTO author (name) VALUES (?)";
+        try {
+            PreparedStatement statement = dbConnection.getConnection().prepareStatement(query);
+            statement.setString(1, authorName);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Something went wrong when trying to add new author: " + e.getMessage());
+        }
+    }
+
 
     public void deleteBook(String isbn) throws SQLException{
         String query = "DELETE FROM book WHERE isbn = ?";
