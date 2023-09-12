@@ -138,7 +138,7 @@ public class Main {
 
             System.out.println("Book has been updated successfully!");
         }else {
-            System.out.println("Either the ISBN is not valid or no book has the ISBN you entered.");
+            System.out.println("No book has the ISBN you entered.");
         }
     }
     private static void deleteBook() throws SQLException{
@@ -149,7 +149,7 @@ public class Main {
             bookService.deleteBook(isbn);
             System.out.println("book deleted successfully!");
         }else {
-            System.out.println("Book doesn't exist");
+            System.out.println("No book has the ISBN you entered.");
         }
     }
     private static void displayAvailableBooks() throws SQLException {

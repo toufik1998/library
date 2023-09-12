@@ -15,7 +15,11 @@ public class BookService {
     }
 
     public void addBook(Book book) throws SQLException {
+        if (bookRepository.getAuthorId(book.getAuthor()) < 1) {
+            bookRepository.addAuthor(book.getAuthor());
+        }
         int authorId = bookRepository.getAuthorId(book.getAuthor());
+
         if (validateBook(book)) {
             bookRepository.addBook(book, authorId);
         }else {
@@ -56,8 +60,7 @@ public class BookService {
         }
     }
 
-    public boolean validateBook(Book book) throws SQLException {
-//        boolean authorId = bookRepository.getAuthorId(book.getAuthor()) >= 0;
+    public boolean validateBook(Book book) {
         boolean isTitleValid = !book.getTitle().isEmpty() && book.getTitle().length() <= 100;
         boolean isISBNValid = book.getIsbn().matches("\\d-\\w{14}");
         boolean isQuantityValid = book.getQuantity() > 0;
