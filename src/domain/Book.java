@@ -9,15 +9,15 @@ import java.util.List;
 
 public class Book {
     private String title;
-    private int idAuthor;
+    private String author;
     private int year;
     private String isbn;
     private int quantity;
     private List<BookCopy> copies;
 
-    public Book(String title, int author, String isbn, int quantity){
+    public Book(String title, String author, String isbn, int quantity){
         this.title = title;
-        this.idAuthor = author;
+        this.author = author;
         this.isbn = isbn;
         this.quantity = quantity;
     }
@@ -30,9 +30,9 @@ public class Book {
         this.title = title;
     }
 
-    public int getAuthor(){ return idAuthor; }
-    public void setAuthor(int author){
-        this.idAuthor = author;
+    public String getAuthor(){ return author; }
+    public void setAuthor(String author){
+        this.author = author;
     }
 
     public String getIsbn(){
