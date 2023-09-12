@@ -9,25 +9,77 @@ import java.sql.SQLException;
 import java.util.*;
 
 public class Main {
+    private static DbConnection dbConnection;
+
+    static {
+        try {
+            dbConnection = new DbConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    private static BookRepository bookRepository = new BookRepository(dbConnection);
+    private static BookService bookService = new BookService(bookRepository);
+
+    private static MemberRepository memberRepository = new MemberRepository(dbConnection);
+    private static MemberService memberService = new MemberService(memberRepository);
+
+    private static ReservationRepository reservationRepository = new ReservationRepository(dbConnection);
+    private static ReservationService reservationService = new ReservationService(reservationRepository);
+
+    private static CopyRepository copyRepository = new CopyRepository(dbConnection);
+    private static CopyService copyService = new CopyService(copyRepository);
+
+    private static Scanner scanner = new Scanner(System.in);
+
     public static void main(String[] args) throws SQLException {
 
-        DbConnection dbConnection = new DbConnection();
+        ShowMenu();
 
-        BookRepository bookRepository = new BookRepository(dbConnection);
-        BookService bookService = new BookService(bookRepository);
+        try {
+            int choiceNumber = scanner.nextInt();
+            scanner.nextLine();
 
-        MemberRepository memberRepository = new MemberRepository(dbConnection);
-        MemberService memberService = new MemberService(memberRepository);
+            switch (choiceNumber) {
+                case 1:
+                    addNewBook();
+                    break;
+                case 2:
+                    updateBook();
+                    break;
+                case 3:
+                    deleteBook();
+                    break;
+                case 4:
+                    displayAvailableBooks();
+                    break;
+                case 5:
+                    displayBorrowedBooks();
+                    break;
+                case 6:
+                    searchBook();
+                    break;
+                case 7:
+                    borrowBook();
+                    break;
+                case 8:
+                    returnBook();
+                    break;
+                case 9:
+                    showStatistics();
+                    break;
+                case 0:
+                    System.out.println("You exited the program successfully.");
+                default:
+                    System.out.println("Option (" + choiceNumber + ") doesn't exist.");
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter a valid number.");
+            scanner.nextLine();
+        }
+    }
 
-        ReservationRepository reservationRepository = new ReservationRepository(dbConnection);
-        ReservationService reservationService = new ReservationService(reservationRepository);
-
-        CopyRepository copyRepository = new CopyRepository(dbConnection);
-        CopyService copyService = new CopyService(copyRepository);
-
-        Scanner scanner = new Scanner(System.in);
-
-
+    private static void ShowMenu(){
         System.out.println("╔═════════════════════════════════════════╗");
         System.out.println("║           Library Management            ║");
         System.out.println("║═════════════════════════════════════════║");
@@ -43,51 +95,9 @@ public class Main {
         System.out.println("║ 0. ║ Exit the program                   ║");
         System.out.println("╚═════════════════════════════════════════╝");
         System.out.println("Enter your choice: ");
+    };
 
-        try {
-            int choiceNumber = scanner.nextInt();
-            scanner.nextLine();
-
-            switch (choiceNumber) {
-                case 1:
-                    addNewBook(scanner, bookService);
-                    break;
-                case 2:
-                    updateBook(scanner, bookService);
-                    break;
-                case 3:
-                    deleteBook(scanner, bookService);
-                    break;
-                case 4:
-                    displayAvailableBooks(bookService);
-                    break;
-                case 5:
-                    displayBorrowedBooks(bookService);
-                    break;
-                case 6:
-                    searchBook(scanner, bookService);
-                    break;
-                case 7:
-                    borrowBook(scanner, bookService, memberService, reservationService, copyService);
-                    break;
-                case 8:
-                    returnBook(scanner, bookService, memberService, reservationService, copyService);
-                    break;
-                case 9:
-                    showStatistics(copyRepository);
-                    break;
-                case 0:
-                    System.out.println("Exited the program successfully.");
-                    return;
-                default:
-                    System.out.println("You entered an invalid input");
-            }
-        }catch (InputMismatchException e){
-            System.out.println("Invalid input. Please enter a number.");
-        }
-    }
-
-    private static void addNewBook(Scanner scanner, BookService bookService) throws SQLException{
+    private static void addNewBook() throws SQLException{
 
         System.out.println("Enter the title of the book:");
         String title = scanner.nextLine();
@@ -95,24 +105,19 @@ public class Main {
         System.out.println("Enter the ISBN of the book:");
         String ISBN = scanner.nextLine();
 
-        System.out.println("Enter the ID of the author:");
-        int author_id = scanner.nextInt();
+        System.out.println("Enter the name of the author:");
+        String author = scanner.nextLine();
 
         System.out.println("Enter the quantity of the book:");
         int quantity = scanner.nextInt();
         scanner.nextLine();
 
-        System.out.println("Title: " + title);
-        System.out.println("ISBN: " + ISBN);
-        System.out.println("Quantity: " + quantity);
-        System.out.println("Author's id: " + author_id);
-        scanner.close();
+        Book newBook = new Book(title, author, ISBN, quantity);
 
-        Book newBook = new Book(title, author_id, ISBN, quantity);
         bookService.addBook(newBook);
     }
 
-    private static void updateBook(Scanner scanner, BookService bookService) throws SQLException{
+    private static void updateBook() throws SQLException{
         System.out.println("Enter the ISBN of the book to update :");
         String isbn = scanner.nextLine();
 
@@ -121,13 +126,13 @@ public class Main {
             String title = scanner.nextLine();
 
             System.out.println("Enter the new ID of the author:");
-            int authorId = scanner.nextInt();
+            String author = scanner.nextLine();
 
             System.out.println("Enter the new quantity of the book:");
             int quantity = scanner.nextInt();
             scanner.nextLine();
 
-            Book updateBook = new Book(title, authorId, isbn, quantity);
+            Book updateBook = new Book(title, author, isbn, quantity);
 
             bookService.updateBook(isbn, updateBook);
 
@@ -136,7 +141,7 @@ public class Main {
             System.out.println("book doesnt exist");
         }
     }
-    private static void deleteBook(Scanner scanner, BookService bookService) throws SQLException{
+    private static void deleteBook() throws SQLException{
         System.out.println("Enter the ISBN of the book");
         String isbn = scanner.nextLine();
 
@@ -147,7 +152,7 @@ public class Main {
             System.out.println("Book doesn't exist");
         }
     }
-    private static void displayAvailableBooks(BookService bookService) throws SQLException {
+    private static void displayAvailableBooks() throws SQLException {
         List<Book> availableBooks = bookService.getAllAvailableBooks();
 
         if(availableBooks.isEmpty()){
@@ -162,10 +167,10 @@ public class Main {
             }
         }
     }
-    private static void displayBorrowedBooks(BookService bookService) throws SQLException {
+    private static void displayBorrowedBooks() throws SQLException {
         System.out.println("Display all borrowed books");
     }
-    private static void searchBook(Scanner scanner, BookService bookService) throws SQLException{
+    private static void searchBook() throws SQLException{
         System.out.println("Do you want to search by title or author :");
         System.out.println("1-Search by title");
         System.out.println("2-Search by author");
@@ -195,7 +200,7 @@ public class Main {
         }
 
     }
-    private static void borrowBook(Scanner scanner, BookService bookService, MemberService memberService, ReservationService reservationService, CopyService copyService ) throws SQLException{
+    private static void borrowBook() throws SQLException{
         System.out.println("Enter the ISBN of the book you want to borrow :");
         String isbn = scanner.nextLine();
 
@@ -225,7 +230,7 @@ public class Main {
             System.out.println("Book doesn't exists");
         }
     }
-    private static void returnBook(Scanner scanner, BookService bookService, MemberService memberService, ReservationService reservationService, CopyService copyService) throws SQLException {
+    private static void returnBook() throws SQLException {
         System.out.println("Enter the ISBN of the book :");
         String isbn = scanner.nextLine();
         if(bookService.isBookExists(isbn)){
@@ -244,7 +249,7 @@ public class Main {
             System.out.println("There is no book with the provided ISBN");
         }
     }
-    private static void showStatistics(CopyRepository copyRepository) throws SQLException {
+    private static void showStatistics() throws SQLException {
         copyRepository.displaystatistics();
         System.out.println("Statistics");
     }

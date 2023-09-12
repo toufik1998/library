@@ -14,17 +14,38 @@ public class BookRepository {
         this.dbConnection = dbConnection;
     }
 
-    public void addBook(Book book) throws SQLException{
+    public void addBook(Book book, int authorId) {
         String query = "INSERT INTO book (title, author_id, isbn, quantity) VALUES (?, ?, ?, ?)";
 
-        PreparedStatement statement = dbConnection.getConnection().prepareStatement(query);
-        statement.setString(1, book.getTitle());
-        statement.setInt(2, book.getAuthor());
-        statement.setString(3, book.getIsbn());
-        statement.setInt(4, book.getQuantity());
+        try {
+            PreparedStatement statement = dbConnection.getConnection().prepareStatement(query);
+            statement.setString(1, book.getTitle());
+            statement.setInt(2, getAuthorId(book.getAuthor()));
+            statement.setString(3, book.getIsbn());
+            statement.setInt(4, book.getQuantity());
 
-        statement.executeUpdate();
+            statement.executeUpdate();
+            System.out.println("New book added successfully.");
+        } catch (SQLException e) {
+            System.out.println("Something went wrong when trying to add the book: " + e.getMessage());
+        }
     };
+
+    public int getAuthorId(String author) throws SQLException {
+        String query = "SELECT ID FROM author WHERE name = ?";
+        PreparedStatement stmt = dbConnection.getConnection().prepareStatement(query);
+        stmt.setString(1, author);
+        ResultSet resultSet = stmt.executeQuery();
+
+        int authorId = -1;
+
+        if (resultSet.next()) {
+            authorId = resultSet.getInt("ID");
+        }
+
+        return authorId;
+
+    }
 
     public boolean isBookExists(String isbn) throws SQLException {
         String query = "SELECT * FROM book WHERE isbn = ?";
@@ -42,7 +63,7 @@ public class BookRepository {
 
         PreparedStatement statement = dbConnection.getConnection().prepareStatement(query);
         statement.setString(1, updateBook.getTitle());
-        statement.setInt(2, updateBook.getAuthor());
+        statement.setInt(2, 1);
         statement.setInt(3, updateBook.getQuantity());
         statement.setString(4, updateBook.getIsbn());
         statement.executeUpdate();
@@ -68,7 +89,7 @@ public class BookRepository {
             String isbn = resultSet.getString("isbn");
             int quantity = resultSet.getInt("quantity");
 
-            Book book = new Book(title, authorId, isbn, quantity);
+            Book book = new Book(title, "name", isbn, quantity);
 
             availableBooks.add(book);
         }
@@ -92,7 +113,7 @@ public class BookRepository {
             String bookISBN = resultSet.getString("isbn");
             int bookQuantity = resultSet.getInt("quantity");
 
-            Book book = new Book(bookTitle, bookAuthorId, bookISBN, bookQuantity);
+            Book book = new Book(bookTitle, "name", bookISBN, bookQuantity);
 
             foundedBooks.add(book);
         }

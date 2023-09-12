@@ -13,9 +13,20 @@ public class BookService {
         this.bookRepository = bookRepository;
     }
 
-    public void addBook(Book book) throws SQLException{
-            bookRepository.addBook(book);
-            System.out.println("Book added successfully.");
+    public void addBook(Book book) throws SQLException {
+        int authorId = bookRepository.getAuthorId(book.getAuthor());
+        boolean isTitleValid = !book.getTitle().isEmpty() && book.getTitle().length() <= 100;
+        boolean isISBNValid = book.getIsbn().matches("[0-9]-.*");
+        boolean isQuantityValid = book.getQuantity() > 0;
+
+        if(authorId > 0){
+            if(isTitleValid && isISBNValid && isQuantityValid){
+                bookRepository.addBook(book, authorId);
+            }
+        }else {
+            System.out.println("No author has the name " + book.getAuthor());
+        }
+
     }
 
     public boolean isBookExists(String isbn) throws SQLException{

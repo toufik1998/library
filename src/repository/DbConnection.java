@@ -12,7 +12,7 @@ public class DbConnection {
         connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/library_management", "root", "");
     }
 
-    public Connection getConnection() {
+    public Connection getConnection() throws SQLException {
         return connection;
     }
 
